@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:maps/widgets/custom_google_map.dart';
 
 void main() {
-  runApp(const MainApp());
+  runApp(const TestGoogleMapsWithFlutter());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+class TestGoogleMapsWithFlutter extends StatelessWidget {
+  const TestGoogleMapsWithFlutter({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
+    return const MaterialApp(home: CustomGoogleMap());
   }
 }
