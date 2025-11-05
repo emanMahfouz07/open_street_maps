@@ -9,7 +9,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_map: ^8.2.2
+  geolocator: ^14.0.2
   google_maps_flutter: ^2.13.1
+  http: ^1.5.0
+  latlong2: ^0.9.1
+  location: ^8.0.1
 
 dev_dependencies:
   flutter_test:
@@ -21,3 +26,4 @@ flutter:
   assets:
     - assets/map_styles/night_map_style.json
     - assets/Images/icons8-marker-100.png
+    - assets/Images/

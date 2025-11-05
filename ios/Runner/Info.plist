@@ -15,7 +15,9 @@
 	<key>CFBundleName</key>
 	<string>maps</string>
 	<key>CFBundlePackageType</key>
-	<string>APPL</string>
+	<string>APPL</string>	
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app requires location to display your current postion on the map</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
