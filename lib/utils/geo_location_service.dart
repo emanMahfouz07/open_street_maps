@@ -2,12 +2,15 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:maps/Models/geo_place_model/geo_place_model.dart';
 
+import 'package:maps/Models/place_deailes_model/properties.dart';
+
 class GeoLocationService {
   final String apiKey = '29e466b51aed4732a5cef3f4aeec458a';
+  final String baseUrl = 'https://api.geoapify.com';
   Future<List<GeoPlaceModel>> autoComplete({required String text}) async {
     var response = await http.get(
       Uri.parse(
-        'https://api.geoapify.com/v1/geocode/autocomplete?text=$text&format=json&apiKey=$apiKey',
+        '$baseUrl/v1/geocode/autocomplete?text=$text&format=json&apiKey=$apiKey',
       ),
     );
     if (response.statusCode == 200) {
@@ -19,6 +22,19 @@ class GeoLocationService {
       return places;
     } else {
       throw Exception('Failed to load autocomplete data');
+    }
+  }
+
+  Future<Properties> getPlaceDetails({required String placeId}) async {
+    var response = await http.get(
+      Uri.parse('$baseUrl/v2/place-details?id=$placeId&apiKey=$apiKey'),
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body)['features'][0]["properties"];
+
+      return Properties.fromJson(data);
+    } else {
+      throw Exception('Failed to load place details: ${response.statusCode}');
     }
   }
 }

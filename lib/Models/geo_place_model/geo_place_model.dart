@@ -1,6 +1,6 @@
 import 'bbox.dart';
 import 'datasource.dart';
-import 'rank.dart';
+
 import 'timezone.dart';
 
 class GeoPlaceModel {
@@ -26,7 +26,7 @@ class GeoPlaceModel {
   Timezone? timezone;
   String? plusCode;
   String? plusCodeShort;
-  Rank? rank;
+
   String? placeId;
   Bbox? bbox;
 
@@ -53,7 +53,7 @@ class GeoPlaceModel {
     this.timezone,
     this.plusCode,
     this.plusCodeShort,
-    this.rank,
+
     this.placeId,
     this.bbox,
   });
@@ -87,10 +87,7 @@ class GeoPlaceModel {
             : Timezone.fromJson(json['timezone'] as Map<String, dynamic>),
     plusCode: json['plus_code'] as String?,
     plusCodeShort: json['plus_code_short'] as String?,
-    rank:
-        json['rank'] == null
-            ? null
-            : Rank.fromJson(json['rank'] as Map<String, dynamic>),
+
     placeId: json['place_id'] as String?,
     bbox:
         json['bbox'] == null
@@ -121,7 +118,7 @@ class GeoPlaceModel {
     'timezone': timezone?.toJson(),
     'plus_code': plusCode,
     'plus_code_short': plusCodeShort,
-    'rank': rank?.toJson(),
+
     'place_id': placeId,
     'bbox': bbox?.toJson(),
   };

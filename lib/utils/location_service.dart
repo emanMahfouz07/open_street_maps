@@ -2,6 +2,7 @@ import 'package:location/location.dart';
 
 class LocationService {
   Location location = Location();
+
   Future<bool> checkAndRequestLocationService() async {
     var isServiceEnabled = await location.serviceEnabled();
     if (!isServiceEnabled) {
@@ -22,13 +23,21 @@ class LocationService {
       permissionStatus = await location.requestPermission();
       if (permissionStatus != PermissionStatus.granted) {
         return false;
-      } else {
-        return true;
       }
     }
     return true;
   }
 
+  /// ⬅️ الميثود الجديدة
+  Future<LocationData?> getCurrentLocation() async {
+    try {
+      return await location.getLocation();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// للستريم لو عايز realtime
   void getRealTimeLocationData(void Function(LocationData)? onData) {
     location.onLocationChanged.listen(onData);
   }

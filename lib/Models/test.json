@@ -1,0 +1,200 @@
+{
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "mode": "drive",
+                "waypoints": [
+                    {
+                        "location": [
+                            4.569876,
+                            50.679023
+                        ],
+                        "original_index": 0
+                    },
+                    {
+                        "location": [
+                            4.578667,
+                            50.661705
+                        ],
+                        "original_index": 1
+                    }
+                ],
+                "units": "metric",
+                "distance": 3032,
+                "distance_units": "meters",
+                "time": 286.707,
+                "legs": [
+                    {
+                        "distance": 3032,
+                        "time": 286.707,
+                        "steps": [
+                            {
+                                "from_index": 0,
+                                "to_index": 1,
+                                "distance": 55,
+                                "time": 5.71,
+                                "instruction": {
+                                    "text": "Drive southeast on Avenue Jacques Georgin."
+                                }
+                            },
+                            {
+                                "from_index": 1,
+                                "to_index": 7,
+                                "distance": 182,
+                                "time": 24.038,
+                                "instruction": {
+                                    "text": "Turn left onto Fond de Bondry."
+                                }
+                            },
+                            {
+                                "from_index": 7,
+                                "to_index": 10,
+                                "distance": 86,
+                                "time": 9.472,
+                                "instruction": {
+                                    "text": "Turn right to stay on Fond de Bondry."
+                                }
+                            },
+                            {
+                                "from_index": 10,
+                                "to_index": 51,
+                                "distance": 1004,
+                                "time": 76.276,
+                                "instruction": {
+                                    "text": "Turn right onto Avenue Albert 1er/N239. Continue on N239."
+                                }
+                            },
+                            {
+                                "from_index": 51,
+                                "to_index": 57,
+                                "distance": 24,
+                                "time": 2.733,
+                                "instruction": {
+                                    "text": "Enter Rond-Point de la Libération des Camps and take the 1st exit onto Avenue Paul Delvaux."
+                                }
+                            },
+                            {
+                                "from_index": 57,
+                                "to_index": 80,
+                                "distance": 354,
+                                "time": 25.672,
+                                "instruction": {
+                                    "text": "Exit the roundabout onto Avenue Paul Delvaux."
+                                }
+                            },
+                            {
+                                "from_index": 80,
+                                "to_index": 83,
+                                "distance": 9,
+                                "time": 0.874,
+                                "instruction": {
+                                    "text": "Enter the roundabout and take the 2nd exit onto Rue des Deux Ponts."
+                                }
+                            },
+                            {
+                                "from_index": 83,
+                                "to_index": 89,
+                                "distance": 156,
+                                "time": 11.456,
+                                "instruction": {
+                                    "text": "Exit the roundabout onto Rue des Deux Ponts."
+                                }
+                            },
+                            {
+                                "from_index": 89,
+                                "to_index": 109,
+                                "distance": 259,
+                                "time": 30.313,
+                                "instruction": {
+                                    "text": "Turn left onto Montagne du Stimont."
+                                }
+                            },
+                            {
+                                "from_index": 109,
+                                "to_index": 126,
+                                "distance": 436,
+                                "time": 45,
+                                "instruction": {
+                                    "text": "Bear right onto Rue de Renivaux."
+                                }
+                            },
+                            {
+                                "from_index": 126,
+                                "to_index": 158,
+                                "distance": 463,
+                                "time": 55.158,
+                                "instruction": {
+                                    "text": "Make a sharp left onto Avenue des Bouleaux."
+                                }
+                            },
+                            {
+                                "from_index": 158,
+                                "to_index": 158,
+                                "distance": 0,
+                                "time": 0,
+                                "instruction": {
+                                    "text": "Your destination is on the right."
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "geometry": {
+                "type": "MultiLineString",
+                "coordinates": [
+                    [
+                        [
+                            4.570128,
+                            50.679194
+                        ],
+                        [
+                            4.570706,
+                            50.678852
+                        ],
+                        [
+                            4.571422,
+                            50.679306
+                        ],
+                        [
+                            4.571714,
+                            50.679485
+                        ],
+                        [
+                            4.578137,
+                            50.662253
+                        ],
+                        [
+                            4.578384,
+                            50.66211
+                        ],
+                        [
+                            4.578641,
+                            50.661972
+                        ],
+                        [
+                            4.578837,
+                            50.661904
+                        ]
+                    ]
+                ]
+            }
+        }
+    ],
+    "properties": {
+        "mode": "drive",
+        "waypoints": [
+            {
+                "lat": 50.67902320667227,
+                "lon": 4.569876996843732
+            },
+            {
+                "lat": 50.66170571489684,
+                "lon": 4.578667041603012
+            }
+        ],
+        "units": "metric"
+    },
+    "type": "FeatureCollection"
+}
