@@ -4,7 +4,6 @@
 // import 'package:maps/Models/routes_model/geometry.dart';
 
 // class RouteService {
-//   final String apiKey = '29e466b51aed4732a5cef3f4aeec458a';
 //   final String baseUrl = 'https://api.geoapify.com';
 
 //   Future<Geometry?> getRouteGeometry({

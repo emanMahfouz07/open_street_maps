@@ -1,11 +1,11 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:maps/Models/geo_place_model/geo_place_model.dart';
-
 import 'package:maps/Models/place_deailes_model/properties.dart';
+import 'package:maps/utils/apis.dart';
 
 class GeoLocationService {
-  final String apiKey = '29e466b51aed4732a5cef3f4aeec458a';
+  final String apiKey = APIKEY.mapsApiKey;
   final String baseUrl = 'https://api.geoapify.com';
   Future<List<GeoPlaceModel>> autoComplete({required String text}) async {
     var response = await http.get(

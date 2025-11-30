@@ -3,10 +3,11 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:maps/Models/routes_model/geometry.dart';
 import 'package:maps/Models/routes_model/routes_model.dart';
+import 'package:maps/utils/apis.dart';
 
 class RoutingService {
   static const String _baseUrl = 'https://api.geoapify.com/v1/routing';
-  final String apiKey = '29e466b51aed4732a5cef3f4aeec458a';
+  final String apiKey = APIKEY.mapsApiKey;
 
   RoutingService();
 
@@ -52,55 +53,24 @@ class RoutingService {
 
         // Parse the response
         final jsonData = json.decode(response.body);
-        print('✅ JSON decoded successfully');
 
         final routeCollection = RouteFeatureCollection.fromJson(jsonData);
-        print('📋 Features count: ${routeCollection.features?.length ?? 0}');
 
-        // Extract the geometry from the first feature
         if (routeCollection.features != null &&
             routeCollection.features!.isNotEmpty) {
           final feature = routeCollection.features!.first;
           final geometry = feature.geometry;
 
-          print('🗺️ Geometry type: ${geometry?.type}');
-          print('📍 Coordinates type: ${geometry?.coordinates.runtimeType}');
-
-          if (geometry?.coordinates != null) {
-            print(
-              '📏 Coordinates length: ${(geometry!.coordinates as List).length}',
-            );
-            print(
-              '🔍 First coordinate sample: ${(geometry.coordinates as List).first}',
-            );
-          }
-
-          // Convert geometry to LatLng points
           final points = geometryToLatLngs(geometry);
-
-          print('✅ FINAL RESULT: ${points.length} LatLng points');
-          if (points.isNotEmpty) {
-            print('   First point: ${points.first}');
-            print('   Last point: ${points.last}');
-          }
-          print('========== ROUTING DEBUG END ==========\n');
 
           return points;
         }
 
-        print('⚠️ No features found in response');
-        print('========== ROUTING DEBUG END ==========\n');
         return [];
       } else {
-        print('❌ HTTP Error: ${response.statusCode}');
-        print('   Response body: ${response.body}');
-        print('========== ROUTING DEBUG END ==========\n');
         throw Exception('Failed to fetch route: ${response.statusCode}');
       }
     } catch (e, stackTrace) {
-      print('❌ EXCEPTION in getRoute: $e');
-      print('   Stack trace: $stackTrace');
-      print('========== ROUTING DEBUG END ==========\n');
       throw Exception('Error fetching route: $e');
     }
   }

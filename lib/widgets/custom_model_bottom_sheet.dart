@@ -5,7 +5,6 @@ import 'package:maps/Models/geo_place_model/geo_place_model.dart';
 import 'package:maps/Models/place_deailes_model/properties.dart';
 import 'package:maps/utils/helper.dart';
 import 'package:maps/utils/location_service.dart';
-import 'package:maps/utils/route_service.dart';
 import 'package:maps/utils/route_test_service.dart';
 import 'package:maps/widgets/custom_country_info.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -116,6 +115,7 @@ class CustomModelBottomSheet extends StatelessWidget {
 
   Widget _buildInfoSection() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (feature.country != null) ...[
           CustomCountryInfo(label: 'Country:', value: feature.country!),
@@ -175,11 +175,9 @@ class CustomModelBottomSheet extends StatelessWidget {
     );
   }
 
-  // Replace the _getDirections method in custom_model_bottom_sheet.dart:
-
   Future<void> _getDirections(BuildContext context) async {
     try {
-      // Check permissions BEFORE closing bottom sheet
+      // تأكد من صلاحيات الموقع أولاً (لا نغلق الـ bottom sheet الآن)
       final hasService = await locationService.checkAndRequestLocationService();
       final hasPermission =
           await locationService.checkAndRequestLocationPermission();
@@ -194,9 +192,7 @@ class CustomModelBottomSheet extends StatelessWidget {
         return;
       }
 
-      // Get current location BEFORE closing bottom sheet
       final currentLocation = await locationService.getCurrentLocation();
-
       if (currentLocation?.latitude == null ||
           currentLocation?.longitude == null) {
         if (context.mounted) {
@@ -214,55 +210,65 @@ class CustomModelBottomSheet extends StatelessWidget {
       );
       final destination = LatLng(lat, lon);
 
-      // Close bottom sheet AFTER we have all the data we need
+      // استخدم context الآمن للـ dialog: root navigator / overlay context
+      final rootCtx = Navigator.of(context, rootNavigator: true).context;
+
+      // اعرض loading باستخدام rootCtx واطمئِن إننا سنغلقه لاحقاً
+      UIHelper.showLoadingDialog(rootCtx);
+
+      List<LatLng> routePoints = [];
+      try {
+        // Fetch route (قد يرمي استثناء)
+        routePoints = await routeTestService.getRoute(
+          origin: origin,
+          destination: destination,
+        );
+      } catch (e) {
+        // لو الفetch فشل: اغلق الـ loading واظهر رسالة خطأ
+        UIHelper.closeDialog(rootCtx);
+        UIHelper.showErrorSnackBar(
+          rootCtx,
+          'Failed to calculate route: ${e.toString()}',
+        );
+        return;
+      }
+
+      // لو مفيش راوت
+      if (routePoints.isEmpty) {
+        UIHelper.closeDialog(rootCtx);
+        UIHelper.showErrorSnackBar(rootCtx, 'No route found to this location');
+        return;
+      }
+
+      // نغلق الـ bottom sheet الآن (الـ context للـ bottom sheet قد يبقى mounted لكن ختامياً هنستخدم rootCtx للـ dialog)
       if (context.mounted) {
         Navigator.of(context).pop();
       }
 
-      // Now fetch route (use root context for loading dialog)
-      final scaffoldContext = context;
-
-      if (scaffoldContext.mounted) {
-        UIHelper.showLoadingDialog(scaffoldContext);
-      }
-
-      // Fetch route
-      final routePoints = await routeTestService.getRoute(
-        origin: origin,
-        destination: destination,
-      );
-
-      // Close loading dialog safely
-      if (scaffoldContext.mounted) {
-        UIHelper.closeDialog(scaffoldContext);
-      }
-
-      if (routePoints.isEmpty) {
-        if (scaffoldContext.mounted) {
-          UIHelper.showErrorSnackBar(
-            scaffoldContext,
-            'No route found to this location',
-          );
-        }
-        return;
-      }
-
-      // Show route on map
+      // أرسل الراوت للـ caller
       onShowRoute(routePoints);
 
-      // Animate map to destination
+      // Close loading dialog safely (لو لسه مفتوح)
+      UIHelper.closeDialog(rootCtx);
+
+      // حاول تحرك الخريطة (لو فشل، اطبع فقط)
       try {
         mapController.move(destination, 14.0);
       } catch (e) {
         debugPrint('Could not move map: $e');
       }
     } catch (e) {
-      if (context.mounted) {
-        UIHelper.closeDialog(context);
+      // أي خطأ غير متوقع: حاول تغلق أي loading مفتوح وتظهر رسالة
+      try {
+        final rootCtx = Navigator.of(context, rootNavigator: true).context;
+        UIHelper.closeDialog(rootCtx);
         UIHelper.showErrorSnackBar(
-          context,
+          rootCtx,
           'Failed to calculate route: ${e.toString()}',
         );
+      } catch (_) {
+ 
+        debugPrint('Error while closing dialog or showing error: $e');
       }
     }
   }
