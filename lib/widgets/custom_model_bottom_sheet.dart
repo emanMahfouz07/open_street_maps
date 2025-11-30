@@ -15,7 +15,7 @@ class CustomModelBottomSheet extends StatelessWidget {
   final double lat;
   final double lon;
   final LocationService locationService;
-  final RouteService routeService;
+
   final RoutingService routeTestService;
   final MapController mapController;
   final FavoritesService favoritesService;
@@ -27,7 +27,6 @@ class CustomModelBottomSheet extends StatelessWidget {
     required this.lat,
     required this.lon,
     required this.locationService,
-    required this.routeService,
     required this.routeTestService,
     required this.mapController,
     required this.favoritesService,
@@ -40,7 +39,6 @@ class CustomModelBottomSheet extends StatelessWidget {
     required double lat,
     required double lon,
     required LocationService locationService,
-    required RouteService routeService,
     required RoutingService routeTestService,
     required MapController mapController,
     required FavoritesService favoritesService,
@@ -58,7 +56,6 @@ class CustomModelBottomSheet extends StatelessWidget {
             lat: lat,
             lon: lon,
             locationService: locationService,
-            routeService: routeService,
             routeTestService: routeTestService,
             mapController: mapController,
             favoritesService: favoritesService,
@@ -162,8 +159,6 @@ class CustomModelBottomSheet extends StatelessWidget {
       city: feature.name,
       formatted: feature.formatted,
       country: feature.country,
-      lat: lat,
-      lon: lon,
     );
 
     favoritesService.togglePlace(place);
@@ -180,30 +175,36 @@ class CustomModelBottomSheet extends StatelessWidget {
     );
   }
 
+  // Replace the _getDirections method in custom_model_bottom_sheet.dart:
+
   Future<void> _getDirections(BuildContext context) async {
-    // Close bottom sheet
-    Navigator.of(context).pop();
-
-    // Show loading
-    UIHelper.showLoadingDialog(context);
-
     try {
-      // Check permissions
+      // Check permissions BEFORE closing bottom sheet
       final hasService = await locationService.checkAndRequestLocationService();
       final hasPermission =
           await locationService.checkAndRequestLocationPermission();
 
       if (!hasService || !hasPermission) {
-        _showError(context, 'Location access is required for directions');
+        if (context.mounted) {
+          UIHelper.showErrorSnackBar(
+            context,
+            'Location access is required for directions',
+          );
+        }
         return;
       }
 
-      // Get current location
+      // Get current location BEFORE closing bottom sheet
       final currentLocation = await locationService.getCurrentLocation();
 
       if (currentLocation?.latitude == null ||
           currentLocation?.longitude == null) {
-        _showError(context, 'Could not determine your current location');
+        if (context.mounted) {
+          UIHelper.showErrorSnackBar(
+            context,
+            'Could not determine your current location',
+          );
+        }
         return;
       }
 
@@ -213,16 +214,36 @@ class CustomModelBottomSheet extends StatelessWidget {
       );
       final destination = LatLng(lat, lon);
 
+      // Close bottom sheet AFTER we have all the data we need
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+
+      // Now fetch route (use root context for loading dialog)
+      final scaffoldContext = context;
+
+      if (scaffoldContext.mounted) {
+        UIHelper.showLoadingDialog(scaffoldContext);
+      }
+
       // Fetch route
       final routePoints = await routeTestService.getRoute(
         origin: origin,
         destination: destination,
       );
 
-      UIHelper.closeDialog(context);
+      // Close loading dialog safely
+      if (scaffoldContext.mounted) {
+        UIHelper.closeDialog(scaffoldContext);
+      }
 
       if (routePoints.isEmpty) {
-        _showError(context, 'No route found to this location');
+        if (scaffoldContext.mounted) {
+          UIHelper.showErrorSnackBar(
+            scaffoldContext,
+            'No route found to this location',
+          );
+        }
         return;
       }
 
@@ -236,12 +257,13 @@ class CustomModelBottomSheet extends StatelessWidget {
         debugPrint('Could not move map: $e');
       }
     } catch (e) {
-      _showError(context, 'Failed to calculate route: ${e.toString()}');
+      if (context.mounted) {
+        UIHelper.closeDialog(context);
+        UIHelper.showErrorSnackBar(
+          context,
+          'Failed to calculate route: ${e.toString()}',
+        );
+      }
     }
-  }
-
-  void _showError(BuildContext context, String message) {
-    UIHelper.closeDialog(context);
-    UIHelper.showErrorSnackBar(context, message);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:maps/Features/Favorites/fav_service.dart';
 import 'package:maps/utils/theme_service.dart';
@@ -30,11 +31,11 @@ class MyApp extends StatelessWidget {
     return Consumer<ThemeService>(
       builder: (context, themeService, _) {
         return MaterialApp(
-          title: 'Maps App',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: themeService.themeMode,
+
           home: const GeoMap(),
         );
       },

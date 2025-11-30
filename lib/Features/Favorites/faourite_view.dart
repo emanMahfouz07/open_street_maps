@@ -42,15 +42,21 @@ class FavoritesView extends StatelessWidget {
           }
 
           return ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: 8),
             itemCount: items.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
+            separatorBuilder:
+                (_, __) => Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 4,
+                    horizontal: 24,
+                  ),
+                  child: const Divider(height: 1, color: Colors.grey),
+                ),
             itemBuilder:
                 (_, index) => _FavoriteListItem(
                   place: items[index],
                   onTap: () {
                     onOpen(items[index]);
-                    Navigator.of(context).pop(); // Close favorites screen
+                    Navigator.of(context).pop();
                   },
                   onRemove:
                       () => _handleRemove(
@@ -129,7 +135,10 @@ class FavoritesView extends StatelessWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Cancel'),
+                child: const Text(
+                  'Cancel',
+                  style: TextStyle(color: Colors.grey),
+                ),
               ),
               TextButton(
                 onPressed: () {
@@ -168,10 +177,14 @@ class _FavoriteListItem extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.1),
+          color: Color(0xffFFF0F3),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Icon(Icons.location_on, color: Colors.red, size: 24),
+        child: const Icon(
+          Icons.location_on,
+          color: Color(0xffC9184A),
+          size: 24,
+        ),
       ),
       title: Text(
         displayName,
@@ -193,7 +206,7 @@ class _FavoriteListItem extends StatelessWidget {
               : null,
       trailing: IconButton(
         icon: const Icon(Icons.favorite),
-        color: Colors.red,
+        color: Color(0xffC9184A),
         tooltip: 'Remove from favorites',
         onPressed: onRemove,
       ),

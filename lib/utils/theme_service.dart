@@ -1,5 +1,8 @@
+// theme_service.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'app_theme.dart';
 
 class ThemeService extends ChangeNotifier {
   static const String _themeKey = 'theme_mode';
@@ -25,7 +28,12 @@ class ThemeService extends ChangeNotifier {
         mode = ThemeMode.system;
     }
 
-    return ThemeService._(prefs, mode);
+    final service = ThemeService._(prefs, mode);
+
+    // تطبيق SystemUiOverlayStyle عند الإقلاع
+    service._applyOverlayFor(mode);
+
+    return service;
   }
 
   ThemeMode get themeMode => _themeMode;
@@ -39,6 +47,9 @@ class ThemeService extends ChangeNotifier {
 
     _themeMode = mode;
     notifyListeners();
+
+    // طبّق overlay بعد تغيّر الثيم
+    _applyOverlayFor(mode);
 
     String value;
     switch (mode) {
@@ -62,5 +73,17 @@ class ThemeService extends ChangeNotifier {
     } else {
       await setThemeMode(ThemeMode.light);
     }
+  }
+
+  void _applyOverlayFor(ThemeMode mode) {
+    Brightness br;
+    if (mode == ThemeMode.system) {
+      br = WidgetsBinding.instance.platformDispatcher.platformBrightness;
+    } else {
+      br = (mode == ThemeMode.dark) ? Brightness.dark : Brightness.light;
+    }
+
+    final overlay = AppTheme.overlayFor(br);
+    SystemChrome.setSystemUIOverlayStyle(overlay);
   }
 }

@@ -10,20 +10,25 @@ class CustomCountryInfo extends StatelessWidget {
   final String value;
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
     return RichText(
       text: TextSpan(
         children: [
           TextSpan(
             text: "$label: ",
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: theme.textTheme.bodyLarge?.color,
               fontSize: 14,
             ),
           ),
           TextSpan(
             text: value,
-            style: const TextStyle(color: Colors.black, fontSize: 14),
+            style: TextStyle(
+              color: theme.textTheme.bodyMedium?.color,
+              fontSize: 14,
+            ),
           ),
         ],
       ),

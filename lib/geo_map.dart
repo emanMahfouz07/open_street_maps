@@ -33,7 +33,6 @@ class _GeoMapState extends State<GeoMap> {
   late GeoLocationService geoLocationService;
   late TextEditingController searchTextController;
 
-  final RouteService routeService = RouteService();
   final RoutingService routingService = RoutingService();
 
   List<GeoPlaceModel> places = [];
@@ -101,155 +100,73 @@ class _GeoMapState extends State<GeoMap> {
         (themeService.themeMode == ThemeMode.system &&
             MediaQuery.of(context).platformBrightness == Brightness.dark);
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Maps'),
-          actions: [
-            IconButton(
-              icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
-              tooltip: isDark ? 'Light Mode' : 'Dark Mode',
-              onPressed: () => themeService.toggleTheme(),
-            ),
-            PopupMenuButton<ThemeMode>(
-              icon: const Icon(Icons.more_vert),
-              onSelected: (mode) => themeService.setThemeMode(mode),
-              itemBuilder:
-                  (context) => [
-                    PopupMenuItem(
-                      value: ThemeMode.light,
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.light_mode,
-                            color:
-                                themeService.isLightMode
-                                    ? Theme.of(context).colorScheme.primary
-                                    : null,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Light',
-                            style: TextStyle(
-                              fontWeight:
-                                  themeService.isLightMode
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: ThemeMode.dark,
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.dark_mode,
-                            color:
-                                themeService.isDarkMode
-                                    ? Theme.of(context).colorScheme.primary
-                                    : null,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Dark',
-                            style: TextStyle(
-                              fontWeight:
-                                  themeService.isDarkMode
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    PopupMenuItem(
-                      value: ThemeMode.system,
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.settings_suggest,
-                            color:
-                                themeService.isSystemMode
-                                    ? Theme.of(context).colorScheme.primary
-                                    : null,
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'System',
-                            style: TextStyle(
-                              fontWeight:
-                                  themeService.isSystemMode
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-            ),
-          ],
-        ),
-        floatingActionButton: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            FloatingActionButton(
-              heroTag: "open_favorites",
-              onPressed: _openFavorites,
-              child: const Icon(Icons.favorite),
-            ),
-            const SizedBox(height: 16),
-            FloatingActionButton(
-              heroTag: "update_location",
-              onPressed: updateMyLocation,
-              child: const Icon(Icons.my_location),
-            ),
-          ],
-        ),
-        body: Stack(
-          children: [
-            FlutterMap(
-              mapController: mapController,
-              options: MapOptions(
-                initialCenter: center,
-                initialZoom: initialZoom,
-                interactionOptions: const InteractionOptions(
-                  flags:
-                      InteractiveFlag.drag |
-                      InteractiveFlag.pinchZoom |
-                      InteractiveFlag.doubleTapZoom,
-                ),
+    final topPadding = MediaQuery.of(context).padding.top;
+
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: "theme_toggle",
+            onPressed: () => themeService.toggleTheme(),
+            tooltip: isDark ? 'Light Mode' : 'Dark Mode',
+            child: Icon(isDark ? Icons.light_mode : Icons.dark_mode),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            heroTag: "open_favorites",
+            onPressed: _openFavorites,
+            child: const Icon(Icons.favorite),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            heroTag: "update_location",
+            onPressed: updateMyLocation,
+            child: const Icon(Icons.my_location),
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          FlutterMap(
+            mapController: mapController,
+            options: MapOptions(
+              initialCenter: center,
+              initialZoom: initialZoom,
+              interactionOptions: const InteractionOptions(
+                flags:
+                    InteractiveFlag.drag |
+                    InteractiveFlag.pinchZoom |
+                    InteractiveFlag.doubleTapZoom,
               ),
+            ),
+            children: [
+              TileLayer(
+                urlTemplate:
+                    isDark
+                        ? AppTheme.getDarkMapTileUrl()
+                        : AppTheme.getLightMapTileUrl(),
+                userAgentPackageName: 'com.example.maps',
+              ),
+              if (polylines.isNotEmpty) PolylineLayer(polylines: polylines),
+              MarkerLayer(markers: markers),
+            ],
+          ),
+          Positioned(
+            left: 16,
+            right: 16,
+            top: topPadding + 8,
+            child: Column(
               children: [
-                TileLayer(
-                  urlTemplate:
-                      isDark
-                          ? AppTheme.getDarkMapTileUrl()
-                          : AppTheme.getLightMapTileUrl(),
-                  userAgentPackageName: 'com.example.maps',
-                ),
-                if (polylines.isNotEmpty) PolylineLayer(polylines: polylines),
-                MarkerLayer(markers: markers),
+                CustomTextField(controller: searchTextController),
+                const SizedBox(height: 8),
+                CustomListView(places: places, onTap: _handlePlaceSelection),
               ],
             ),
-            Positioned(
-              left: 16,
-              right: 16,
-              top: 8,
-              child: Column(
-                children: [
-                  const SizedBox(height: 10),
-                  CustomTextField(controller: searchTextController),
-                  const SizedBox(height: 8),
-                  CustomListView(places: places, onTap: _handlePlaceSelection),
-                ],
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -374,8 +291,6 @@ class _GeoMapState extends State<GeoMap> {
   Future<void> _getDirectionsToFavorite(GeoPlaceModel place) async {
     if (place.lat == null || place.lon == null) return;
 
-    UIHelper.showLoadingDialog(context);
-
     try {
       final hasService = await locationService.checkAndRequestLocationService();
       final hasPermission =
@@ -383,7 +298,6 @@ class _GeoMapState extends State<GeoMap> {
 
       if (!hasService || !hasPermission) {
         if (mounted) {
-          UIHelper.closeDialog(context);
           UIHelper.showErrorSnackBar(
             context,
             'Location access is required for directions',
@@ -392,12 +306,34 @@ class _GeoMapState extends State<GeoMap> {
         return;
       }
 
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(width: 16),
+                Text('Calculating route...'),
+              ],
+            ),
+            duration: Duration(seconds: 30),
+          ),
+        );
+      }
+
       final currentLocation = await locationService.getCurrentLocation();
 
       if (currentLocation?.latitude == null ||
           currentLocation?.longitude == null) {
         if (mounted) {
-          UIHelper.closeDialog(context);
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
           UIHelper.showErrorSnackBar(
             context,
             'Could not determine your current location',
@@ -418,7 +354,7 @@ class _GeoMapState extends State<GeoMap> {
       );
 
       if (!mounted) return;
-      UIHelper.closeDialog(context);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
       if (routePoints.isEmpty) {
         UIHelper.showErrorSnackBar(context, 'No route found to this location');
@@ -429,15 +365,33 @@ class _GeoMapState extends State<GeoMap> {
         polylines = [
           Polyline(points: routePoints, color: Colors.blue, strokeWidth: 5.0),
         ];
+        markers = [
+          Marker(
+            point: origin,
+            child: Icon(Icons.my_location, color: Colors.green[700], size: 40),
+          ),
+          Marker(
+            point: destination,
+            child: Icon(Icons.location_on, color: Colors.red[700], size: 40),
+          ),
+        ];
       });
 
       final bounds = LatLngBounds.fromPoints(routePoints);
       mapController.fitCamera(
         CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50)),
       );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Route displayed successfully'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
     } catch (e) {
       if (mounted) {
-        UIHelper.closeDialog(context);
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         UIHelper.showErrorSnackBar(
           context,
           'Failed to calculate route: ${e.toString()}',
@@ -505,19 +459,87 @@ class _GeoMapState extends State<GeoMap> {
       lat: lat,
       lon: lon,
       locationService: locationService,
-      routeService: routeService,
       mapController: mapController,
-      onShowRoute: (routePoints) {
+      onShowRoute: (routePoints) async {
+        print('\n========== ON SHOW ROUTE DEBUG ==========');
+        print('🔵 onShowRoute called with ${routePoints.length} points');
+        print('🔍 Route points sample (first 3):');
+        for (
+          int i = 0;
+          i < (routePoints.length > 3 ? 3 : routePoints.length);
+          i++
+        ) {
+          print('   Point $i: ${routePoints[i]}');
+        }
+
+        if (!mounted) {
+          print('❌ Widget not mounted, aborting');
+          print('========== ON SHOW ROUTE DEBUG END ==========\n');
+          return;
+        }
+
+        // Get current location for the origin marker
+        final currentLocation = await locationService.getCurrentLocation();
+        final origin =
+            currentLocation != null &&
+                    currentLocation.latitude != null &&
+                    currentLocation.longitude != null
+                ? LatLng(currentLocation.latitude!, currentLocation.longitude!)
+                : null;
+
+        print('📍 Origin: $origin');
+        print('📍 Destination: LatLng($lat, $lon)');
+
+        print(
+          '🎨 Creating polyline with ${routePoints.length} points, color: blue, width: 5.0',
+        );
+        print('📌 Creating ${origin != null ? 2 : 1} markers');
+
         setState(() {
           polylines = [
             Polyline(points: routePoints, color: Colors.blue, strokeWidth: 5.0),
           ];
+
+          print('✅ Polylines set: ${polylines.length} polyline(s)');
+          print('   Polyline[0] has ${polylines[0].points.length} points');
+
+          // Add markers for origin and destination
+          markers = [
+            if (origin != null)
+              Marker(
+                point: origin,
+                child: Icon(
+                  Icons.my_location,
+                  color: Colors.green[700],
+                  size: 40,
+                ),
+              ),
+            Marker(
+              point: LatLng(lat, lon),
+              child: Icon(Icons.location_on, color: Colors.red[700], size: 40),
+            ),
+          ];
+
+          print('✅ Markers set: ${markers.length} marker(s)');
         });
 
-        final bounds = LatLngBounds.fromPoints(routePoints);
-        mapController.fitCamera(
-          CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50)),
-        );
+        print('⏳ Waiting 150ms before fitting camera...');
+        await Future.delayed(const Duration(milliseconds: 150));
+
+        if (mounted) {
+          print('📸 Fitting camera to bounds...');
+          final bounds = LatLngBounds.fromPoints(routePoints);
+          print(
+            '   Bounds: ${bounds.north}, ${bounds.south}, ${bounds.east}, ${bounds.west}',
+          );
+
+          mapController.fitCamera(
+            CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50)),
+          );
+          print('✅ Camera fitted successfully');
+        }
+
+        print('========== ON SHOW ROUTE DEBUG END ==========\n');
       },
       routeTestService: routingService,
       favoritesService: favoritesService,
