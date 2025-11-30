@@ -24,10 +24,8 @@ View, edit, and navigate to your saved places easily.
 
 Full support for dark theme.
 
-Automatically switches based on device settings.
-
 🗺️ Map Services
 
 Built with OpenStreetMap tiles.
 
-Place search, reverse geocoding, route generation via Geoapify.
+Place search, place autocomplete, route generation via Geoapify.
