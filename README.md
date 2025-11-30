@@ -29,3 +29,6 @@ Full support for dark theme.
 Built with OpenStreetMap tiles.
 
 Place search, place autocomplete, route generation via Geoapify.
+
+
+[![App Demo](assets/screenshots/app.jbg)](https://drive.google.com/file/d/1gdJLlptmPvJS4U2hZXp6iz3_zixOloxX/view?usp=drive_link)
